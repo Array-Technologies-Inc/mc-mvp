@@ -41,7 +41,6 @@ services:
       - ./conf/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./conf/grafana/dashboards/victoriametrics.json:/var/lib/grafana/dashboards/vm.json
       - ./conf/grafana/dashboards/victorialogs.json:/var/lib/grafana/dashboards/logs.json
-      - ./conf/grafana/dashboards/tracker.json:/var/lib/grafana/dashboards/tracker.json
       - ./conf/grafana/dashboards/operator.json:/var/lib/grafana/dashboards/operator.json
       - ./conf/grafana/dashboards/22759_rev6.json:/var/lib/grafana/dashboards/node.json
       - ./conf/grafana/dashboards/vmagent.json:/var/lib/grafana/dashboards/vmagent.json
