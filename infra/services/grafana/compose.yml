@@ -1,0 +1,18 @@
+services:
+  # Grafana instance configured with VictoriaMetrics as datasource
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:11.5.0
+    depends_on:
+      - "victoriametrics"
+      - "victorialogs"
+    environment:
+      - "GF_INSTALL_PLUGINS=victoriametrics-logs-datasource"
+    ports:
+      - 3000:3000
+    volumes:
+      - mc-grafana:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  mc-grafana: {}

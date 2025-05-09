@@ -1,0 +1,58 @@
+include:
+  - services/victoria/compose.yml
+  - services/grafana/compose.yml
+  - services/postgresql/compose.yml
+
+services:
+  victoriametrics:
+    networks:
+      mc-bridge:
+
+  victorialogs:
+    networks:
+      mc-bridge:
+
+  vmagent:
+    volumes:
+      - ./conf/vmagent_conf/prometheus_server.yml:/etc/prometheus/prometheus.yml
+    networks:
+      mc-bridge:
+
+  vmalert:
+    volumes:
+      - ./conf/vmalert_rules/alerts.yml:/etc/alerts/alerts.yml
+      - ./conf/vmalert_rules/alerts-health.yml:/etc/alerts/alerts-health.yml
+      - ./conf/vmalert_rules/alerts-vmagent.yml:/etc/alerts/alerts-vmagent.yml
+      - ./conf/vmalert_rules/alerts-vmalert.yml:/etc/alerts/alerts-vmalert.yml
+      - ./conf/vmalert_rules/alerts-vmanomaly.yml:/etc/alerts/alerts-vmanomaly.yml
+      - ./conf/vmalert_rules/alerts-vlogs.yml:/etc/alerts/alerts-vlogs.yml
+    networks:
+      mc-bridge:
+
+  alertmanager:
+    volumes:
+      - ./conf/alertmanager_conf/alertmanager.yml:/config/alertmanager.yml
+    networks:
+      mc-bridge:
+
+  grafana:
+    volumes:
+      - ./conf/grafana/provisioning/datasources/victoriametrics-logs-datasource/victoriametrics-logs-datasource.yml:/etc/grafana/provisioning/datasources/victoriametrics-logs-datasource.yml
+      - ./conf/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./conf/grafana/dashboards/victoriametrics.json:/var/lib/grafana/dashboards/vm.json
+      - ./conf/grafana/dashboards/victorialogs.json:/var/lib/grafana/dashboards/logs.json
+      - ./conf/grafana/dashboards/tracker.json:/var/lib/grafana/dashboards/tracker.json
+      - ./conf/grafana/dashboards/operator.json:/var/lib/grafana/dashboards/operator.json
+      - ./conf/grafana/dashboards/22759_rev6.json:/var/lib/grafana/dashboards/node.json
+      - ./conf/grafana/dashboards/vmagent.json:/var/lib/grafana/dashboards/vmagent.json
+      - ./conf/grafana/dashboards/vmalert.json:/var/lib/grafana/dashboards/vmalert.json
+    networks:
+      mc-bridge:
+
+  db:
+    networks:
+      mc-bridge:
+
+networks:
+  mc-bridge:
+    driver: bridge

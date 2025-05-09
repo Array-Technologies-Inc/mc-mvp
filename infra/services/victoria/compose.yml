@@ -1,0 +1,92 @@
+services:
+  victoriametrics:
+    container_name: victoriametrics
+    image: victoriametrics/victoria-metrics:v1.111.0
+    ports:
+      - 8428:8428
+    volumes:
+      - mc-vmdata:/storage
+    command:
+      - "--storageDataPath=/storage"
+      - "--httpListenAddr=:8428"
+      - "-loggerFormat=json"
+      - "--vmalert.proxyURL=http://vmalert:8880"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:8428/health" ]
+      interval: 1s
+      timeout: 1s
+      retries: 10
+
+  victorialogs:
+    image: docker.io/victoriametrics/victoria-logs:v1.15.0-victorialogs
+    container_name: victorialogs
+    ports:
+      - 9428:9428
+    volumes:
+      - mc-victorialogs:/vlogs
+    command:
+      - -storageDataPath=/vlogs
+      - -loggerFormat=json
+      - -syslog.listenAddr.tcp=0.0.0.0:8094
+      - -datadog.streamFields=service,hostname,ddsource
+      - -journald.streamFields=_HOSTNAME,_SYSTEMD_UNIT,_PID
+      - -journald.ignoreFields=MESSAGE_ID,INVOCATION_ID,USER_INVOCATION_ID,
+      - -journald.ignoreFields=_BOOT_ID,_MACHINE_ID,_SYSTEMD_INVOCATION_ID,_STREAM_ID,_UID
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:9428/health" ]
+      interval: 1s
+      timeout: 1s
+      retries: 10
+
+  vmagent:
+    container_name: vmagent
+    image: victoriametrics/vmagent:v1.112.0
+    depends_on:
+      - "victoriametrics"
+    ports:
+      - 8440:8429
+    volumes:
+      - mc-vmagentdata:/vmagentdata
+    command:
+      - "--promscrape.config=/etc/prometheus/prometheus.yml"
+      - "--remoteWrite.url=http://victoriametrics:8428/api/v1/write"
+      - "-enableTCP6"
+    restart: unless-stopped
+
+  # vmalert executes alerting and recording rules
+  vmalert:
+    container_name: vmalert
+    image: victoriametrics/vmalert:v1.112.0
+    depends_on:
+      - "victoriametrics"
+      - "alertmanager"
+    ports:
+      - 8880:8880
+    command:
+      - "--datasource.url=http://victoriametrics:8428/"
+      - "--remoteRead.url=http://victoriametrics:8428/"
+      - "--remoteWrite.url=http://vmagent:8429/"
+      - "--notifier.url=http://alertmanager:9093/"
+      - "--rule=/etc/alerts/*.yml"
+      # display source of alerts in grafana
+      - "--external.url=http://127.0.0.1:3000" #grafana outside container
+      - '--external.alert.source=explore?orgId=1&left={"datasource":"VictoriaMetrics","queries":[{"expr":{{.Expr|jsonEscape|queryEscape}},"refId":"A"}],"range":{"from":"{{ .ActiveAt.UnixMilli }}","to":"now"}}'
+    restart: unless-stopped
+
+  # alertmanager receives alerting notifications from vmalert
+  # and distributes them according to --config.file.
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager:v0.28.0
+    command:
+      - "--config.file=/config/alertmanager.yml"
+    ports:
+      - 9093:9093
+    restart: unless-stopped
+
+volumes:
+  mc-vmdata: {}
+  mc-victorialogs: {}
+  mc-vmagentdata: {}
