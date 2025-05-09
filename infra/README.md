@@ -8,6 +8,11 @@ Using docker
 docker-compose -f ./base.yml up -d
 ```
 
+Stop services
+```bash
+ podman-compose -f ./base.yml down  
+```
+
 # Services
 
 ## Victoria
@@ -34,3 +39,20 @@ Password: admin
 * User: dbuser
 * Password: dbpassword
 * DB name: mcdb
+
+## NATS
+
+### Test it
+
+Run a NATS client:
+```bash
+podman run --network infra_mc-bridge --rm -it natsio/nats-box
+or
+docker run --network infra_mc-bridge --rm -it natsio/nats-box
+```
+
+Send messages:
+```bash
+nats sub -s nats://nats:4222 topic &
+nats pub -s "nats://nats:4222" topic [MESSAGE]
+```

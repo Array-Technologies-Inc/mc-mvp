@@ -2,6 +2,7 @@ include:
   - services/victoria/compose.yml
   - services/grafana/compose.yml
   - services/postgresql/compose.yml
+  - services/nats/compose.yml
 
 services:
   victoriametrics:
@@ -49,6 +50,10 @@ services:
       mc-bridge:
 
   db:
+    networks:
+      mc-bridge:
+
+  nats:
     networks:
       mc-bridge:
 
