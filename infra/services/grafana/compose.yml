@@ -6,8 +6,9 @@ services:
     depends_on:
       - "victoriametrics"
       - "victorialogs"
-    environment:
-      - "GF_INSTALL_PLUGINS=victoriametrics-logs-datasource"
+    #environment:
+      # - "GF_INSTALL_PLUGINS=victoriametrics-logs-datasource"
+      # - "GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource"
     ports:
       - 3000:3000
     volumes:
