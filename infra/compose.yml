@@ -39,10 +39,10 @@ services:
   grafana:
     volumes:
       - ./conf/grafana/provisioning/datasources/victoriametrics-logs-datasource/victoriametrics-logs-datasource.yml:/etc/grafana/provisioning/datasources/victoriametrics-logs-datasource.yml
+      - ./conf/grafana/provisioning/datasources/victoriametrics-metrics-datasource/single.yml:/etc/grafana/provisioning/datasources/victoriametrics-metrics-datasource.yml
       - ./conf/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./conf/grafana/dashboards/victoriametrics.json:/var/lib/grafana/dashboards/vm.json
       - ./conf/grafana/dashboards/victorialogs.json:/var/lib/grafana/dashboards/logs.json
-      - ./conf/grafana/dashboards/operator.json:/var/lib/grafana/dashboards/operator.json
       - ./conf/grafana/dashboards/22759_rev6.json:/var/lib/grafana/dashboards/node.json
       - ./conf/grafana/dashboards/vmagent.json:/var/lib/grafana/dashboards/vmagent.json
       - ./conf/grafana/dashboards/vmalert.json:/var/lib/grafana/dashboards/vmalert.json
