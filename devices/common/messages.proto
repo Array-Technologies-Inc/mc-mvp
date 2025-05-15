@@ -1,0 +1,21 @@
+edition = "2023";
+
+package messages;
+
+enum TrackerMode {
+  AUTO = 0;
+  OFF = 1;
+}
+
+message TelemetryRequest {
+
+}
+
+message Telemetry {
+  string mac = 1;
+  float current_position = 2;
+  float target_position = 3;
+  float battery_soc = 4;
+  bool charging = 5;
+  TrackerMode mode = 6;
+}

@@ -1,0 +1,32 @@
+[project]
+name = "devices"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "protobuf>=6.30.2",
+    "requests>=2.32.3",
+]
+
+[dependency-groups]
+lint = [
+    "ruff>=0.11.9",
+]
+
+[tool.uv.sources]
+tracker = {path="./tracker"}
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-dir]
+tracker = "./tracker"
+gateway = "./gateway"
+devices = "."
+
+[project.scripts]
+tracker = "tracker.tracker:main"
+gateway = "gateway.gateway:main"
+

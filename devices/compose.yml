@@ -1,0 +1,38 @@
+services:
+  gateway:
+    image: localhost/gateway
+    container_name: "gw-${GW_ID}"
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    networks:
+      mc-bridge:
+      gw-network:
+    environment:
+      - NODES_COUNT=$NODES_COUNT
+      - GW_ID=$GW_ID
+    depends_on:
+      - tracker
+
+  tracker:
+    image: localhost/tracker-controller
+    container_name: "gw-${GW_ID}_tracker_1"
+    expose:
+      - 6543
+    build:
+      context: .
+      dockerfile: tracker/Dockerfile
+    deploy:
+      mode: replicated
+      replicas: $NODES_COUNT
+    networks:
+      gw-network:
+
+networks:
+  gw-network:
+    driver: bridge
+  mc-bridge:
+    name: infra_mc-bridge
+    external: true
+
+name: gw-$GW_ID

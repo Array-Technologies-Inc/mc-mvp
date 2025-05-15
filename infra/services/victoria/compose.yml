@@ -46,7 +46,9 @@ services:
     depends_on:
       - "victoriametrics"
     ports:
-      - 8440:8429
+      - 8429:8429
+    expose:
+      - 8429
     volumes:
       - mc-vmagentdata:/vmagentdata
     command:
